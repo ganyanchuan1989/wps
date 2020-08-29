@@ -16,6 +16,7 @@
  */
 let testFuncs=null;
 function dispatcher(info) {
+    console.log('dispatcher', info)
     var funcs = info.funcs;
 
     //执行web页面传递的方法
@@ -49,6 +50,10 @@ function dispatcher(info) {
     return {message:"ok", app:wps.WpsApplication().Name}
 }
 
+
+function say(info) {
+    console.log('custom say, info', info)
+}
 
 /**
  * 获取活动文档的状态

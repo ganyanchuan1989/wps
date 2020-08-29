@@ -23,7 +23,30 @@ function _WpsInvoke(funcs) {
                 alert(result.message)
 
             } else {
-                console.log(result.response)
+                console.log('result.response', result.response)
+                showresult(result.response)
+            }
+        })
+}
+
+function _WpsInvoke2(funcs) {
+    var info = {};
+    info.funcs = funcs;
+    var func = bUseHttps ? WpsInvoke.InvokeAsHttps : WpsInvoke.InvokeAsHttp
+    func(WpsInvoke.ClientType.wps, // 组件类型
+        "WpsOAAssist", // 插件名，与wps客户端加载的加载的插件名对应
+        "say", // 插件方法入口，与wps客户端加载的加载的插件代码对应，详细见插件代码
+        info, // 传递给插件的数据
+        function (result) { // 调用回调，status为0为成功，其他是错误
+            if (result.status) {
+                if (bUseHttps && result.status == 100) {
+                    WpsInvoke.AuthHttpesCert('请在稍后打开的网页中，点击"高级" => "继续前往"，完成授权。')
+                    return;
+                }
+                alert(result.message)
+
+            } else {
+                console.log('result.response', result.response)
                 showresult(result.response)
             }
         })
@@ -50,6 +73,7 @@ WpsInvoke.RegWebNotify(WpsInvoke.ClientType.wps, "WpsOAAssist", function (messag
 
 
 function showresult(resultData) {
+    console.log('showresult eval')
     let json = eval('(' + resultData + ')')
     switch (json.message) {
         case "GetDocStatus": {
@@ -77,6 +101,26 @@ function newDoc() {
         "NewDoc": {}
     }]) // NewDoc方法对应于OA助手dispatcher支持的方法名
 }
+
+function newDoc2() {
+    _WpsInvoke2([{
+        "NewDoc": {}
+    }]) // NewDoc方法对应于OA助手dispatcher支持的方法名
+}
+_wps['newDoc2'] = {
+    action: newDoc2,
+    code: _WpsInvoke2.toString() + "\n\n" + newDoc2.toString(),
+    detail: "\n\
+  说明：\n\
+    点击按钮，打开WPS文字后,新建一个空白doc文档\n\
+\n\
+  方法使用：\n\
+    页面点击按钮，通过wps客户端协议来启动WPS，调用oaassist插件，执行插件中的js函数NewDoc,新建一个空白doc\n\
+    funcs参数说明:\n\
+        NewDoc方法对应于OA助手dispatcher支持的方法名\n\
+"
+}
+
 
 _wps['newDoc'] = {
     action: newDoc,
